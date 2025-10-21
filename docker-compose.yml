@@ -1,0 +1,49 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - AUTH_URL=http://novatek.nntc.pro/auth
+      - REALM=cartography
+      - CLIENT_ID=cartography
+      - CLIENT_SECRET=08e516f0-4208-4c3b-81da-9bfd4cc8c29c
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=common_bfe
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: unless-stopped
+    command: |
+      postgres
+      -c listen_addresses='*'
+      -c log_connections=on
+    environment:
+      - POSTGRES_DB=common_bfe
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
